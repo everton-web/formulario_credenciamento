@@ -1,6 +1,15 @@
 var SHEET_NAME = 'Inscricoes';
+var SHEET_VAGAS = 'Vagas';
 
 var FUNCOES_MUNICIPIO = ['Secretário Municipal', 'Gestor Escolar', 'Diretor de NTE', 'Técnico Municipal', 'Técnico NTE'];
+
+var VAGAS_LIMITES = {
+  'CAV/DIE/SGINF': 8, 'Agentes Pedagógicos Municipais': 417, 'NTE': 54, 'IAT': 10, 'SUPED': 10,
+  'SUPROT': 5, 'SGINF': 20, 'SUPEC': 2, 'SUDEP': 2, 'APG': 2, 'GAB/SEC': 2, 'TCE': 3, 'TCM': 3,
+  'SEFAZ': 3, 'SEI': 3, 'FEEBA': 4, 'CEE': 4, 'UNCME': 4, 'UNDIME': 4,
+  'CEEPE/ Universidades Estaduais e Federais': 10, 'IFs': 4, 'IRDEB': 2, 'APLB': 3, 'FTE': 3,
+  'UPB': 3, 'FGV/DGPE': 5
+};
 
 function doGet(e) {
   var action = e.parameter.action;
@@ -78,6 +87,7 @@ function doPost(e) {
       payload.funcao
     ]);
 
+    atualizarPainelVagas();
     return jsonResponse({ success: true });
 
   } catch (err) {
@@ -98,6 +108,70 @@ function getSheet() {
     sheet.setFrozenRows(1);
   }
   return sheet;
+}
+
+function atualizarPainelVagas() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_VAGAS);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_VAGAS);
+  } else {
+    sheet.clearContents();
+  }
+
+  // Cabeçalho
+  var header = [['Função / Instituição', 'Limite', 'Inscritos', 'Disponíveis']];
+  sheet.getRange(1, 1, 1, 4).setValues(header)
+    .setFontWeight('bold')
+    .setBackground('#1a3a8a')
+    .setFontColor('#ffffff');
+
+  // Conta inscrições por função na aba Inscricoes
+  var inscSheet = getSheet();
+  var dados = inscSheet.getDataRange().getValues();
+  var contagem = {};
+  for (var i = 1; i < dados.length; i++) {
+    var f = String(dados[i][6] || '').trim();
+    if (f) contagem[f] = (contagem[f] || 0) + 1;
+  }
+
+  // Monta linhas
+  var rows = [];
+  var funcoes = Object.keys(VAGAS_LIMITES);
+  for (var k = 0; k < funcoes.length; k++) {
+    var nome = funcoes[k];
+    var limite = VAGAS_LIMITES[nome];
+    var inscritos = contagem[nome] || 0;
+    var disponíveis = Math.max(0, limite - inscritos);
+    rows.push([nome, limite, inscritos, disponíveis]);
+  }
+
+  if (rows.length > 0) {
+    var dataRange = sheet.getRange(2, 1, rows.length, 4);
+    dataRange.setValues(rows);
+
+    // Destaca vagas esgotadas em vermelho
+    for (var r = 0; r < rows.length; r++) {
+      var cor = rows[r][3] === 0 ? '#fce8e8' : (rows[r][3] <= 2 ? '#fff3cd' : '#ffffff');
+      sheet.getRange(r + 2, 1, 1, 4).setBackground(cor);
+    }
+  }
+
+  // Linha de totais
+  var totalRow = rows.length + 2;
+  var totalInscritos = rows.reduce(function(s, r) { return s + r[2]; }, 0);
+  var totalLimite = rows.reduce(function(s, r) { return s + r[1]; }, 0);
+  var totalDisp = rows.reduce(function(s, r) { return s + r[3]; }, 0);
+  sheet.getRange(totalRow, 1, 1, 4)
+    .setValues([['TOTAL', totalLimite, totalInscritos, totalDisp]])
+    .setFontWeight('bold')
+    .setBackground('#e8edf5');
+
+  sheet.setColumnWidth(1, 280);
+  sheet.setColumnWidth(2, 80);
+  sheet.setColumnWidth(3, 90);
+  sheet.setColumnWidth(4, 100);
+  sheet.setFrozenRows(1);
 }
 
 function jsonResponse(obj) {

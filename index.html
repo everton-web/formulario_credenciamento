@@ -87,7 +87,7 @@
     .countdown-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 0.75rem; }
     .countdown-boxes { display: flex; gap: 0.6rem; }
     .countdown-box { flex: 1; text-align: center; }
-    .countdown-box span { display: block; font-size: 1.8rem; font-weight: 700; color: var(--accent); line-height: 1; }
+    .countdown-box span { display: block; font-size: 1.8rem; font-weight: 700; color: var(--accent-red); line-height: 1; }
     .countdown-box small { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-top: 3px; display: block; }
     .countdown-sep { font-size: 1.6rem; font-weight: 300; color: var(--border); align-self: flex-start; padding-top: 2px; }
     .countdown-aviso { margin-top: 0.75rem; font-size: 0.75rem; color: var(--accent-red); font-weight: 500; }
@@ -105,8 +105,10 @@
       .info-group { display: table; margin: 0 auto; }
       .info-item { justify-content: flex-start; text-align: left; }
       .event-info p { white-space: normal; max-width: 280px; margin-left: auto; margin-right: auto; }
-      .right-panel { padding: 4rem 1.5rem 5rem; overflow-y: visible; }
-      .card { max-width: 100%; }
+      .right-panel { padding: 4rem 1.5rem 5rem; overflow-y: visible; align-items: center; }
+      .card { max-width: 100%; text-align: center; }
+      .card label { text-align: left; }
+      .card .field-error { text-align: left; }
       .countdown-boxes { justify-content: center; }
     }
   </style>
@@ -149,7 +151,7 @@
 
       <div id="form-encerrado" class="form-encerrado" style="display:none;">
         <h3>Inscrições encerradas</h3>
-        <p>O prazo de inscrições foi encerrado em 01/07/2026 às 18h.</p>
+        <p>O prazo de inscrições foi encerrado em 01/07/2026, às 18h.</p>
       </div>
       <div id="form-container">
       <div class="form-header"><h2>Formulário de Inscrição</h2><p>Selecione sua função e preencha os dados.</p></div>

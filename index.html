@@ -82,6 +82,19 @@
     .toast.success { background: rgba(26,138,74,0.08); border: 1.5px solid rgba(26,138,74,0.2); color: var(--success); display: block; }
     .toast.error { background: rgba(212,43,43,0.06); border: 1.5px solid rgba(212,43,43,0.15); color: var(--error); display: block; }
 
+    /* Countdown */
+    .countdown-wrap { margin-top: 2rem; }
+    .countdown-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6); margin-bottom: 0.6rem; }
+    .countdown-boxes { display: flex; gap: 0.5rem; }
+    .countdown-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0.5rem 0.7rem; text-align: center; min-width: 54px; }
+    .countdown-box span { display: block; font-size: 1.6rem; font-weight: 700; color: #fff; line-height: 1; }
+    .countdown-box small { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6); margin-top: 2px; display: block; }
+    .countdown-aviso { margin-top: 0.8rem; font-size: 0.72rem; color: rgba(255,255,255,0.75); font-style: italic; line-height: 1.4; }
+    .encerrado-badge { margin-top: 2rem; background: rgba(212,43,43,0.25); border: 1px solid rgba(212,43,43,0.5); border-radius: 8px; padding: 0.7rem 1rem; color: #fff; font-size: 0.85rem; font-weight: 600; text-align: center; letter-spacing: 0.5px; }
+    .form-encerrado { text-align: center; padding: 2rem 0; }
+    .form-encerrado h3 { color: var(--accent-red); font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .form-encerrado p { color: var(--muted); font-size: 0.9rem; }
+
     @media (max-width: 900px) {
       .container { flex-direction: column; }
       .left-panel { min-height: auto; padding: 3rem 1.5rem 5rem; }
@@ -94,6 +107,7 @@
       .event-info p { white-space: normal; max-width: 280px; margin-left: auto; margin-right: auto; }
       .right-panel { padding: 4rem 1.5rem 5rem; overflow-y: visible; }
       .card { max-width: 100%; }
+      .countdown-boxes { justify-content: center; }
     }
   </style>
 </head>

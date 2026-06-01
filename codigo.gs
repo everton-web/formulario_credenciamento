@@ -202,10 +202,11 @@ function atualizarPainelVagas() {
 
   // Monta linhas
   var rows = [];
-  var funcoes = Object.keys(VAGAS_LIMITES);
+  var funcoesData = carregarFuncoes();
+  var funcoes = Object.keys(funcoesData.vagasLimites);
   for (var k = 0; k < funcoes.length; k++) {
     var nome = funcoes[k];
-    var limite = VAGAS_LIMITES[nome];
+    var limite = funcoesData.vagasLimites[nome];
     var inscritos = contagem[nome] || 0;
     var disponíveis = Math.max(0, limite - inscritos);
     rows.push([nome, limite, inscritos, disponíveis]);

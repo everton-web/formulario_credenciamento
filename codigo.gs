@@ -8,7 +8,7 @@ function doGet(e) {
   if (action === 'getDadosIniciais') {
     var sheet = getSheet();
     var dados = sheet.getDataRange().getValues();
-    var municipiosOcupados = [];
+    var municipiosOcupados = {};
     var contagemVagas = {};
 
     for (var i = 1; i < dados.length; i++) {
@@ -16,9 +16,12 @@ function doGet(e) {
       var municipio = String(dados[i][4] || '').trim();
 
       if (FUNCOES_MUNICIPIO.indexOf(funcao) !== -1) {
-        // Função municipal: registra município como ocupado
-        if (municipio && municipiosOcupados.indexOf(municipio) === -1) {
-          municipiosOcupados.push(municipio);
+        // Função municipal: registra por função -> lista de municípios ocupados
+        if (municipio) {
+          if (!municipiosOcupados[funcao]) municipiosOcupados[funcao] = [];
+          if (municipiosOcupados[funcao].indexOf(municipio) === -1) {
+            municipiosOcupados[funcao].push(municipio);
+          }
         }
       } else if (funcao) {
         // Função institucional: conta vagas
@@ -44,14 +47,14 @@ function doPost(e) {
     var dados = sheet.getDataRange().getValues();
     var ehFuncaoMunicipal = FUNCOES_MUNICIPIO.indexOf(payload.funcao) !== -1;
 
-    // Verifica município duplicado (apenas para funções municipais)
+    // Verifica município duplicado por função (uma inscrição por função por município)
     if (ehFuncaoMunicipal && payload.municipio) {
       for (var i = 1; i < dados.length; i++) {
         if (String(dados[i][4]).trim() === payload.municipio &&
-            FUNCOES_MUNICIPIO.indexOf(String(dados[i][6]).trim()) !== -1) {
+            String(dados[i][6]).trim() === payload.funcao) {
           return jsonResponse({
             success: false,
-            message: 'O município "' + payload.municipio + '" já possui inscrição.'
+            message: 'O município "' + payload.municipio + '" já possui um(a) "' + payload.funcao + '" inscrito(a).'
           });
         }
       }

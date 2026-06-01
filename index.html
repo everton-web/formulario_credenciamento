@@ -51,6 +51,7 @@
     .card { width: 100%; max-width: 500px; animation: fadeUp 0.6s cubic-bezier(.22,.68,0,1.2) both; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
+    .mobile-br { display: none; }
     .form-header { margin-bottom: 1.5rem; }
     .form-header h2 { font-size: 1.5rem; color: var(--accent); font-weight: 600; }
     .form-header p { color: var(--muted); font-size: 0.9rem; }
@@ -105,6 +106,7 @@
       .info-group { display: table; margin: 0 auto; }
       .info-item { justify-content: flex-start; text-align: left; }
       .event-info p { white-space: normal; max-width: 280px; margin-left: auto; margin-right: auto; }
+      .mobile-br { display: inline; }
       .right-panel { padding: 4rem 1.5rem 5rem; overflow-y: visible; align-items: center; }
       .card { max-width: 100%; text-align: center; }
       .card label { text-align: left; }
@@ -119,7 +121,7 @@
   <div class="left-panel" id="leftPanel">
     <div class="event-info">
       <h1>Seminário de Divulgação dos Resultados<span class="highlight">SABE 2025</span></h1>
-      <p>Preencha os dados ao lado para confirmar sua participação.</p>
+      <p>Preencha os dados ao lado<br class="mobile-br"> para confirmar sua participação.</p>
 
       <div class="info-group">
         <div class="info-item"><div class="info-icon">📅</div><div class="info-text"><strong>Data</strong><span>07 de Julho de 2026</span></div></div>

@@ -161,7 +161,13 @@
   function init() {
     fetch(APPS_SCRIPT_URL + '?action=getDadosIniciais')
       .then(r => r.json())
-      .then(data => { dadosApi = data; popularFuncoes(); popularMunicipios(); })
+      .then(data => {
+        dadosApi = data;
+        if (data.funcoesMunicipais) FUNCOES_MUNICIPIO = data.funcoesMunicipais;
+        if (data.vagasLimites) VAGAS_LIMITES = data.vagasLimites;
+        popularFuncoes();
+        popularMunicipios();
+      })
       .catch(() => { document.getElementById('funcao').innerHTML = '<option value="" disabled selected>Erro ao carregar</option>'; });
   }
 

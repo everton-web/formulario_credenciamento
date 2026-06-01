@@ -1,20 +1,81 @@
 var SHEET_NAME = 'Inscricoes';
 var SHEET_VAGAS = 'Vagas';
+var SHEET_FUNCOES = 'Funcoes';
 
-var FUNCOES_MUNICIPIO = ['Secretário Municipal', 'Gestor Escolar', 'Diretor de NTE', 'Técnico Municipal', 'Técnico NTE'];
+function getFuncoesSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_FUNCOES);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_FUNCOES);
+    sheet.appendRow(['Nome', 'Limite', 'Tipo']);
+    sheet.getRange(1, 1, 1, 3).setFontWeight('bold').setBackground('#1a3a8a').setFontColor('#ffffff');
 
-var VAGAS_LIMITES = {
-  'CAV/DIE/SGINF': 8, 'Agentes Pedagógicos Municipais': 417, 'NTE': 54, 'IAT': 10, 'SUPED': 10,
-  'SUPROT': 5, 'SGINF': 20, 'SUPEC': 2, 'SUDEP': 2, 'APG': 2, 'GAB/SEC': 2, 'TCE': 3, 'TCM': 3,
-  'SEFAZ': 3, 'SEI': 3, 'FEEBA': 4, 'CEE': 4, 'UNCME': 4, 'UNDIME': 4,
-  'CEEPE/ Universidades Estaduais e Federais': 10, 'IFs': 4, 'IRDEB': 2, 'APLB': 3, 'FTE': 3,
-  'UPB': 3, 'FGV/DGPE': 5
-};
+    var defaults = [
+      ['Secretário Municipal', 0, 'Municipal'],
+      ['Gestor Escolar', 0, 'Municipal'],
+      ['Diretor de NTE', 0, 'Municipal'],
+      ['Técnico Municipal', 0, 'Municipal'],
+      ['Técnico NTE', 0, 'Municipal'],
+      ['CAV/DIE/SGINF', 8, 'Institucional'],
+      ['Agentes Pedagógicos Municipais', 417, 'Institucional'],
+      ['NTE', 54, 'Institucional'],
+      ['IAT', 10, 'Institucional'],
+      ['SUPED', 10, 'Institucional'],
+      ['SUPROT', 5, 'Institucional'],
+      ['SGINF', 20, 'Institucional'],
+      ['SUPEC', 2, 'Institucional'],
+      ['SUDEP', 2, 'Institucional'],
+      ['APG', 2, 'Institucional'],
+      ['GAB/SEC', 2, 'Institucional'],
+      ['TCE', 3, 'Institucional'],
+      ['TCM', 3, 'Institucional'],
+      ['SEFAZ', 3, 'Institucional'],
+      ['SEI', 3, 'Institucional'],
+      ['FEEBA', 4, 'Institucional'],
+      ['CEE', 4, 'Institucional'],
+      ['UNCME', 4, 'Institucional'],
+      ['UNDIME', 4, 'Institucional'],
+      ['CEEPE/ Universidades Estaduais e Federais', 10, 'Institucional'],
+      ['IFs', 4, 'Institucional'],
+      ['IRDEB', 2, 'Institucional'],
+      ['APLB', 3, 'Institucional'],
+      ['FTE', 3, 'Institucional'],
+      ['UPB', 3, 'Institucional'],
+      ['FGV/DGPE', 5, 'Institucional']
+    ];
+    sheet.getRange(2, 1, defaults.length, 3).setValues(defaults);
+    sheet.setColumnWidth(1, 300);
+    sheet.setColumnWidth(2, 80);
+    sheet.setColumnWidth(3, 120);
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function carregarFuncoes() {
+  var sheet = getFuncoesSheet();
+  var dados = sheet.getDataRange().getValues();
+  var funcoesMunicipais = [];
+  var vagasLimites = {};
+  for (var i = 1; i < dados.length; i++) {
+    var nome = String(dados[i][0] || '').trim();
+    var limite = parseInt(dados[i][1]) || 0;
+    var tipo = String(dados[i][2] || '').trim();
+    if (!nome) continue;
+    if (tipo === 'Municipal') {
+      funcoesMunicipais.push(nome);
+    } else {
+      vagasLimites[nome] = limite;
+    }
+  }
+  return { funcoesMunicipais: funcoesMunicipais, vagasLimites: vagasLimites };
+}
 
 function doGet(e) {
   var action = e.parameter.action;
 
   if (action === 'getDadosIniciais') {
+    var funcoes = carregarFuncoes();
     var sheet = getSheet();
     var dados = sheet.getDataRange().getValues();
     var municipiosOcupados = {};
@@ -24,8 +85,7 @@ function doGet(e) {
       var funcao = String(dados[i][6] || '').trim();
       var municipio = String(dados[i][4] || '').trim();
 
-      if (FUNCOES_MUNICIPIO.indexOf(funcao) !== -1) {
-        // Função municipal: registra por função -> lista de municípios ocupados
+      if (funcoes.funcoesMunicipais.indexOf(funcao) !== -1) {
         if (municipio) {
           if (!municipiosOcupados[funcao]) municipiosOcupados[funcao] = [];
           if (municipiosOcupados[funcao].indexOf(municipio) === -1) {
@@ -33,12 +93,16 @@ function doGet(e) {
           }
         }
       } else if (funcao) {
-        // Função institucional: conta vagas
         contagemVagas[funcao] = (contagemVagas[funcao] || 0) + 1;
       }
     }
 
-    return jsonResponse({ municipiosOcupados: municipiosOcupados, contagemVagas: contagemVagas });
+    return jsonResponse({
+      municipiosOcupados: municipiosOcupados,
+      contagemVagas: contagemVagas,
+      funcoesMunicipais: funcoes.funcoesMunicipais,
+      vagasLimites: funcoes.vagasLimites
+    });
   }
 
   return jsonResponse({ status: 'API funcionando' });
@@ -52,9 +116,10 @@ function doPost(e) {
       return jsonResponse({ success: false, message: 'Acao invalida.' });
     }
 
+    var funcoes = carregarFuncoes();
     var sheet = getSheet();
     var dados = sheet.getDataRange().getValues();
-    var ehFuncaoMunicipal = FUNCOES_MUNICIPIO.indexOf(payload.funcao) !== -1;
+    var ehFuncaoMunicipal = funcoes.funcoesMunicipais.indexOf(payload.funcao) !== -1;
 
     // Verifica município duplicado por função (uma inscrição por função por município)
     if (ehFuncaoMunicipal && payload.municipio) {

@@ -83,13 +83,14 @@
     .toast.error { background: rgba(212,43,43,0.06); border: 1.5px solid rgba(212,43,43,0.15); color: var(--error); display: block; }
 
     /* Countdown */
-    .countdown-wrap { background: var(--accent); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; }
-    .countdown-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 0.7rem; }
-    .countdown-boxes { display: flex; gap: 0.5rem; }
-    .countdown-box { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0.5rem 0.7rem; text-align: center; flex: 1; }
-    .countdown-box span { display: block; font-size: 1.6rem; font-weight: 700; color: #fff; line-height: 1; }
-    .countdown-box small { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6); margin-top: 2px; display: block; }
-    .countdown-aviso { margin-top: 0.75rem; font-size: 0.72rem; color: rgba(255,255,255,0.8); font-style: italic; line-height: 1.4; }
+    .countdown-wrap { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1.5px solid var(--border); }
+    .countdown-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 0.75rem; }
+    .countdown-boxes { display: flex; gap: 0.6rem; }
+    .countdown-box { flex: 1; text-align: center; }
+    .countdown-box span { display: block; font-size: 1.8rem; font-weight: 700; color: var(--accent); line-height: 1; }
+    .countdown-box small { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-top: 3px; display: block; }
+    .countdown-sep { font-size: 1.6rem; font-weight: 300; color: var(--border); align-self: flex-start; padding-top: 2px; }
+    .countdown-aviso { margin-top: 0.75rem; font-size: 0.75rem; color: var(--accent-red); font-weight: 500; }
     .form-encerrado { text-align: center; padding: 2rem 0; }
     .form-encerrado h3 { color: var(--accent-red); font-size: 1.3rem; margin-bottom: 0.5rem; }
     .form-encerrado p { color: var(--muted); font-size: 0.9rem; }
@@ -136,8 +137,11 @@
         <div class="countdown-label">Inscrições encerram em</div>
         <div class="countdown-boxes">
           <div class="countdown-box"><span id="cd-dias">--</span><small>Dias</small></div>
+          <div class="countdown-sep">:</div>
           <div class="countdown-box"><span id="cd-horas">--</span><small>Horas</small></div>
+          <div class="countdown-sep">:</div>
           <div class="countdown-box"><span id="cd-min">--</span><small>Min</small></div>
+          <div class="countdown-sep">:</div>
           <div class="countdown-box"><span id="cd-seg">--</span><small>Seg</small></div>
         </div>
         <div class="countdown-aviso">As inscrições não poderão ser feitas no local do evento!</div>
@@ -263,7 +267,7 @@
     .then(() => { btn.classList.remove('loading'); btn.disabled = false; });
   });
 
-  var DEADLINE = new Date('2026-07-01T18:00:00-03:00');
+  var DEADLINE = new Date('2020-01-01T00:00:00-03:00'); // TESTE: data passada
 
   function pad(n) { return String(n).padStart(2, '0'); }
 

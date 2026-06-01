@@ -83,14 +83,13 @@
     .toast.error { background: rgba(212,43,43,0.06); border: 1.5px solid rgba(212,43,43,0.15); color: var(--error); display: block; }
 
     /* Countdown */
-    .countdown-wrap { margin-top: 2rem; }
-    .countdown-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6); margin-bottom: 0.6rem; }
+    .countdown-wrap { background: var(--accent); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; }
+    .countdown-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 0.7rem; }
     .countdown-boxes { display: flex; gap: 0.5rem; }
-    .countdown-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0.5rem 0.7rem; text-align: center; min-width: 54px; }
+    .countdown-box { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0.5rem 0.7rem; text-align: center; flex: 1; }
     .countdown-box span { display: block; font-size: 1.6rem; font-weight: 700; color: #fff; line-height: 1; }
     .countdown-box small { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6); margin-top: 2px; display: block; }
-    .countdown-aviso { margin-top: 0.8rem; font-size: 0.72rem; color: rgba(255,255,255,0.75); font-style: italic; line-height: 1.4; }
-    .encerrado-badge { margin-top: 2rem; background: rgba(212,43,43,0.25); border: 1px solid rgba(212,43,43,0.5); border-radius: 8px; padding: 0.7rem 1rem; color: #fff; font-size: 0.85rem; font-weight: 600; text-align: center; letter-spacing: 0.5px; }
+    .countdown-aviso { margin-top: 0.75rem; font-size: 0.72rem; color: rgba(255,255,255,0.8); font-style: italic; line-height: 1.4; }
     .form-encerrado { text-align: center; padding: 2rem 0; }
     .form-encerrado h3 { color: var(--accent-red); font-size: 1.3rem; margin-bottom: 0.5rem; }
     .form-encerrado p { color: var(--muted); font-size: 0.9rem; }
@@ -125,6 +124,14 @@
         <div class="info-item"><div class="info-icon">⏰</div><div class="info-text"><strong>Horário</strong><span>8h às 17:30h</span></div></div>
       </div>
 
+    </div>
+    <div class="logo-sec">
+      <img src="https://z-cdn-media.chatglm.cn/files/2920ac5c-31b9-4d3e-bf55-bdab3ca2d933.png?auth_key=1880326424-e81dabbf5c044dd8b9069506f99d0614-0-a27c7e82d9218a188cf7893a5c22e190" alt="Brasão Secretaria da Educação" />
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="card">
       <div class="countdown-wrap" id="countdown-wrap">
         <div class="countdown-label">Inscrições encerram em</div>
         <div class="countdown-boxes">
@@ -135,15 +142,7 @@
         </div>
         <div class="countdown-aviso">As inscrições não poderão ser feitas no local do evento!</div>
       </div>
-      <div class="encerrado-badge" id="encerrado-badge" style="display:none;">🔒 Inscrições encerradas</div>
-    </div>
-    <div class="logo-sec">
-      <img src="https://z-cdn-media.chatglm.cn/files/2920ac5c-31b9-4d3e-bf55-bdab3ca2d933.png?auth_key=1880326424-e81dabbf5c044dd8b9069506f99d0614-0-a27c7e82d9218a188cf7893a5c22e190" alt="Brasão Secretaria da Educação" />
-    </div>
-  </div>
 
-  <div class="right-panel">
-    <div class="card">
       <div id="form-encerrado" class="form-encerrado" style="display:none;">
         <h3>Inscrições encerradas</h3>
         <p>O prazo de inscrições foi encerrado em 01/07/2026 às 18h.</p>
@@ -272,7 +271,6 @@
     var agora = new Date();
     if (agora >= DEADLINE) {
       document.getElementById('countdown-wrap').style.display = 'none';
-      document.getElementById('encerrado-badge').style.display = 'block';
       document.getElementById('form-container').style.display = 'none';
       document.getElementById('form-encerrado').style.display = 'block';
       return true;

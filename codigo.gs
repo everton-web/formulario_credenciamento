@@ -239,6 +239,18 @@ function atualizarPainelVagas() {
   sheet.setFrozenRows(1);
 }
 
+function onOpen() {
+  getFuncoesSheet();
+}
+
+function onEdit(e) {
+  if (!e || !e.source) return;
+  var sheetName = e.range.getSheet().getName();
+  if (sheetName === SHEET_NAME || sheetName === SHEET_FUNCOES) {
+    atualizarPainelVagas();
+  }
+}
+
 function jsonResponse(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))

@@ -175,8 +175,8 @@
     sel.appendChild(groupMun);
     var groupInst = document.createElement('optgroup'); groupInst.label = "Instituições e Setores";
     Object.keys(VAGAS_LIMITES).forEach(function(f) {
-      var count = dadosApi.contagemVagas[f] || 0; var limit = VAGAS_LIMITES[f]; var txt = f + " (" + count + "/" + limit + ")";
-      var opt = new Option(txt, f);
+      var count = dadosApi.contagemVagas[f] || 0; var limit = VAGAS_LIMITES[f];
+      var opt = new Option(f, f);
       if (count >= limit) { opt.disabled = true; opt.textContent = f + " (VAGAS ESGOTADAS)"; }
       groupInst.appendChild(opt);
     });

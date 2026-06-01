@@ -27,14 +27,14 @@
     }
     .event-info { position: relative; z-index: 1; color: #fff; max-width: 420px; text-align: left; }
     
-    /* Logo */
-    .logo-sec { margin-bottom: 1.5rem; }
-    .logo-sec img { 
-      height: 70px; /* Aumentei um pouco pois brasões são detalhados */
-      width: auto; 
-      display: block; 
-      mix-blend-mode: multiply; /* REMOVE O FUNDO BRANCO AUTOMATICAMENTE */
-      filter: contrast(1.1); /* Pequeno ajuste de contraste */
+    /* Logo rodapé */
+    .logo-sec { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.15); }
+    .logo-sec img {
+      height: 40px;
+      width: auto;
+      display: block;
+      mix-blend-mode: multiply;
+      filter: contrast(1.1);
     }
     
     .event-info h1 { font-size: 1.3rem; font-weight: 400; line-height: 1.3; margin-bottom: 0.5rem; color: #fff; }
@@ -99,16 +99,15 @@
 <div class="container">
   <div class="left-panel" id="leftPanel">
     <div class="event-info">
-      <div class="logo-sec">
-        <!-- SUBSTITUA ABAIXO PELO NOME DO ARQUIVO LOCAL EX: logo.png OU MANTE O LINK -->
-        <img src="https://z-cdn-media.chatglm.cn/files/2920ac5c-31b9-4d3e-bf55-bdab3ca2d933.png?auth_key=1880326424-e81dabbf5c044dd8b9069506f99d0614-0-a27c7e82d9218a188cf7893a5c22e190" alt="Brasão Secretaria da Educação" />
-      </div>
       <h1>Seminário de Divulgação dos Resultados<span class="highlight">SABE 2025</span></h1>
       <p>Preencha os dados ao lado para<br>confirmar sua participação.</p>
-      
+
       <div class="info-item"><div class="info-icon">📅</div><div class="info-text"><strong>Data</strong><span>07 de Julho de 2026</span></div></div>
       <div class="info-item"><div class="info-icon">📍</div><div class="info-text"><strong>Local</strong><span>SENAI - CIMATEC<br/>Av. Orlando Gomes, 1845 - Piatã, Salvador</span></div></div>
       <div class="info-item"><div class="info-icon">⏰</div><div class="info-text"><strong>Horário</strong><span>8h às 17:30h</span></div></div>
+      <div class="logo-sec">
+        <img src="https://z-cdn-media.chatglm.cn/files/2920ac5c-31b9-4d3e-bf55-bdab3ca2d933.png?auth_key=1880326424-e81dabbf5c044dd8b9069506f99d0614-0-a27c7e82d9218a188cf7893a5c22e190" alt="Brasão Secretaria da Educação" />
+      </div>
     </div>
   </div>
 

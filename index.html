@@ -263,9 +263,8 @@
       if (/^NTE/.test(f)) return; // NTE tratado separadamente
       var count = (dadosApi.contagemVagas || {})[f] || 0;
       var limit = VAGAS_LIMITES[f];
-      var opt = new Option(f, f);
-      if (count >= limit) { opt.disabled = true; opt.textContent = f + ' (VAGAS ESGOTADAS)'; }
-      groupInst.appendChild(opt);
+      if (count >= limit) return;
+      groupInst.appendChild(new Option(f, f));
     });
     sel.appendChild(groupInst);
   }
@@ -275,9 +274,8 @@
     sel.innerHTML = '<option value="" disabled selected>Selecione o NTE</option>';
     NTE_LISTA.forEach(function(nte) {
       var todasEsgotadas = NTE_FUNCOES.every(function(f) { return !isNteDisponivel(nte, f); });
-      var opt = new Option(nte, nte);
-      if (todasEsgotadas) { opt.disabled = true; opt.textContent = nte + ' (VAGAS ESGOTADAS)'; }
-      sel.appendChild(opt);
+      if (todasEsgotadas) return;
+      sel.appendChild(new Option(nte, nte));
     });
   }
 
@@ -285,12 +283,8 @@
     var sel = document.getElementById('nte-funcao');
     sel.innerHTML = '<option value="" disabled selected>Selecione sua função</option>';
     NTE_FUNCOES.forEach(function(funcao) {
-      var opt = new Option(funcao, funcao);
-      if (!isNteDisponivel(nteNumero, funcao)) {
-        opt.disabled = true;
-        opt.textContent = funcao + ' (VAGA ESGOTADA)';
-      }
-      sel.appendChild(opt);
+      if (!isNteDisponivel(nteNumero, funcao)) return;
+      sel.appendChild(new Option(funcao, funcao));
     });
   }
 
@@ -299,9 +293,8 @@
     var ocupados = dadosApi.municipiosSecretario || [];
     sel.innerHTML = '<option value="" disabled selected>Selecione seu município</option>';
     TODOS_MUNICIPIOS.forEach(function(m) {
-      var opt = new Option(m, m);
-      if (ocupados.indexOf(m) !== -1) { opt.disabled = true; opt.textContent = m + ' (VAGA OCUPADA)'; }
-      sel.appendChild(opt);
+      if (ocupados.indexOf(m) !== -1) return;
+      sel.appendChild(new Option(m, m));
     });
   }
 

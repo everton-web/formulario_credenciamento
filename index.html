@@ -260,10 +260,17 @@
 
     var groupInst = document.createElement('optgroup');
     groupInst.label = 'Instituições e Setores';
+
+    // NTE — entrada fixa que aciona o fluxo de sub-campos
     groupInst.appendChild(new Option('NTE', 'NTE'));
+
+    // Secretário(a) Municipal — fixo com nome correto (independe da planilha)
+    groupInst.appendChild(new Option('Secretário(a) Municipal', 'Secretário(a) Municipal'));
+
     Object.keys(VAGAS_LIMITES).forEach(function(f) {
-      if (/^NTE/.test(f)) return; // NTE tratado separadamente
-      if (f === 'Técnico Municipal') return; // sub-opção de Secretário(a) Municipal
+      if (/^NTE/.test(f)) return;
+      // Já adicionados manualmente acima
+      if (f === 'Técnico Municipal' || f === 'Secretário(a) Municipal' || f === 'Secretário Municipal') return;
       var count = (dadosApi.contagemVagas || {})[f] || 0;
       var limit = VAGAS_LIMITES[f];
       if (count >= limit) return;

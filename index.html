@@ -14,7 +14,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; background-color: var(--bg); }
     .container { display: flex; width: 100%; min-height: 100vh; }
-    
+
     /* Lado Esquerdo */
     .left-panel {
       flex: 1; background-size: cover; background-position: center; position: relative;
@@ -23,10 +23,10 @@
     }
     .left-panel::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 37, 96, 0.88); 
+      background: rgba(15, 37, 96, 0.88);
     }
     .event-info { position: relative; z-index: 1; color: #fff; max-width: 420px; text-align: left; }
-    
+
     /* Logo rodapé */
     .logo-sec { position: absolute; bottom: 2rem; left: 0; right: 0; text-align: center; z-index: 1; }
     .logo-sec img {
@@ -36,7 +36,7 @@
       mix-blend-mode: multiply;
       filter: contrast(1.1);
     }
-    
+
     .event-info h1 { font-size: 1.3rem; font-weight: 400; line-height: 1.3; margin-bottom: 0.5rem; color: #fff; }
     .event-info h1 .highlight { display: block; font-size: 4.5rem; font-weight: 700; margin-top: 0.2rem; line-height: 1.1; color: #fff; }
     .event-info p { font-size: 0.78rem; font-weight: 400; color: rgba(255,255,255,0.9); margin-bottom: 2.5rem; line-height: 1.5; white-space: nowrap; }
@@ -61,25 +61,25 @@
     .field { display: flex; flex-direction: column; gap: 0.35rem; }
     label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; color: var(--accent); text-transform: uppercase; }
     label span { color: var(--accent-red); margin-left: 2px; }
-    
+
     input, select { background: var(--input-bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.92rem; transition: border-color 0.2s, box-shadow 0.2s; outline: none; width: 100%; }
     input:focus, select:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(26,58,138,0.1); }
-    
+
     .field-error { font-size: 0.76rem; color: var(--error); display: none; font-weight: 500; }
     .field.invalid input, .field.invalid select { border-color: var(--error); }
     .field.invalid .field-error { display: block; }
-    
+
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    
+
     .btn { margin-top: 1rem; background: var(--accent-red); color: #ffffff; border: none; border-radius: 8px; padding: 0.9rem 1.5rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s; box-shadow: 0 4px 12px rgba(212,43,43,0.2); }
     .btn:hover { background: var(--accent-red-light); }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    
+
     .btn .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .btn.loading .btn-text { display: none; }
     .btn.loading .spinner { display: block; }
-    
+
     .toast { margin-top: 1rem; padding: 0.85rem 1rem; border-radius: 8px; font-size: 0.85rem; text-align: center; display: none; font-weight: 500; }
     .toast.success { background: rgba(26,138,74,0.08); border: 1.5px solid rgba(26,138,74,0.2); color: var(--success); display: block; }
     .toast.error { background: rgba(212,43,43,0.06); border: 1.5px solid rgba(212,43,43,0.15); color: var(--error); display: block; }
@@ -175,7 +175,8 @@
         </div>
         <div class="field" id="f-email"><label for="email">E-mail <span>*</span></label><input type="email" id="email" placeholder="seu@email.com" autocomplete="email"/><span class="field-error">Informe um e-mail válido.</span></div>
         <div class="field" id="f-funcao"><label for="funcao">Função / Instituição <span>*</span></label><select id="funcao"><option value="" disabled selected>Carregando opções...</option></select><span class="field-error">Selecione uma função.</span></div>
-        <div class="field" id="f-municipio" style="display:none;"><label for="municipio">Município <span>*</span></label><select id="municipio"><option value="" disabled selected>Selecione seu município</option></select><span class="field-error">Selecione um município.</span></div>
+        <div class="field" id="f-nte-numero" style="display:none;"><label for="nte-numero">Número do NTE <span>*</span></label><select id="nte-numero"><option value="" disabled selected>Selecione o NTE</option></select><span class="field-error">Selecione o número do NTE.</span></div>
+        <div class="field" id="f-nte-funcao" style="display:none;"><label for="nte-funcao">Função no NTE <span>*</span></label><select id="nte-funcao"><option value="" disabled selected>Selecione sua função</option></select><span class="field-error">Selecione sua função no NTE.</span></div>
         <button type="submit" class="btn" id="btn-submit"><span class="btn-text">Confirmar Inscrição</span><div class="spinner"></div></button>
         <div class="toast" id="toast"></div>
       </form>
@@ -190,38 +191,56 @@
   var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyz9dx8bbjwI3R0RRSnoYcDe-5y98qwtRHbV_vzWvJ-AWUm4eZnsEcIL2QQZhGjjUhH/exec';
   // =============================================================
 
-  var MODO_FUNDO = 'normal'; 
+  // Atualizar com a lista completa de NTEs
+  var NTE_LISTA = [
+    'NTE 01', 'NTE 02', 'NTE 03', 'NTE 04', 'NTE 05',
+    'NTE 06', 'NTE 07', 'NTE 08', 'NTE 09', 'NTE 10',
+    'NTE 11', 'NTE 12', 'NTE 13', 'NTE 14', 'NTE 15',
+    'NTE 16', 'NTE 17', 'NTE 18', 'NTE 19', 'NTE 20',
+    'NTE 21', 'NTE 22', 'NTE 23', 'NTE 24', 'NTE 25',
+    'NTE 26', 'NTE 27'
+  ];
+  var NTE_FUNCOES = ['Diretor', 'Ponto Focal'];
+
+  var MODO_FUNDO = 'normal';
   var styleTag = document.createElement('style');
   document.head.appendChild(styleTag);
   var blendRule = '';
-  if (MODO_FUNDO !== 'normal') { blendRule = `.left-panel::before { mix-blend-mode: ${MODO_FUNDO}; background: rgba(15, 37, 96, 1); }`; } 
+  if (MODO_FUNDO !== 'normal') { blendRule = `.left-panel::before { mix-blend-mode: ${MODO_FUNDO}; background: rgba(15, 37, 96, 1); }`; }
   else { blendRule = `.left-panel::before { mix-blend-mode: normal; background: rgba(15, 37, 96, 0.88); }`; }
   styleTag.innerHTML = blendRule;
 
   var VAGAS_LIMITES = {
-    'CAV/DIE/SGINF': 8, 'Agentes Pedagógicos Municipais': 417, 'NTE': 54, 'NTE 19': 3, 'IAT': 10, 'SUPED': 10,
-    'SUPROT': 5, 'SGINF': 20, 'SUPEC': 2, 'SUDEP': 2, 'APG': 2, 'GAB/SEC': 2, 'TCE': 3, 'TCM': 3,
-    'SEFAZ': 3, 'SEI': 3, 'FEEBA': 4, 'CEE': 4, 'UNCME': 4, 'UNDIME': 4,
-    'CEEPE/ Universidades Estaduais e Federais': 10, 'IFs': 4, 'IRDEB': 2, 'APLB': 3, 'FTE': 3,
-    'UPB': 3, 'FGV/DGPE': 5
+    'CAV/DIE/SGINF': 8, 'Secretário Municipal': 417, 'IAT': 10, 'SUPED': 10,
+    'SUPROT': 5, 'SGINF': 20, 'SUPEC': 2, 'SUDEP': 2, 'APG': 2, 'GAB/SEC': 2,
+    'TCE': 3, 'TCM': 3, 'SEFAZ': 3, 'SEI': 3, 'FEEBA': 4, 'CEE': 4, 'UNCME': 4,
+    'UNDIME': 4, 'CEEPE/ Universidades Estaduais e Federais': 10, 'IFs': 4,
+    'IRDEB': 2, 'APLB': 3, 'FTE': 3, 'UPB': 3, 'FGV/DGPE': 5
   };
-  var FUNCOES_MUNICIPIO = ['Secretário Municipal', 'Gestor Escolar', 'Diretor de NTE', 'Técnico Municipal', 'Técnico NTE'];
-  var TODOS_MUNICIPIOS = ["Abaíra", "Abaré", "Acajutiba", "Adustina", "Água Fria", "Aiquara", "Alagoinhas", "Alcobaça", "Almadina", "Amargosa", "Amélia Rodrigues", "América Dourada", "Anagé", "Andaraí", "Andorinha", "Angical", "Anguera", "Antas", "Antônio Cardoso", "Antônio Gonçalves", "Aporá", "Apuarema", "Araçás", "Aracatu", "Araci", "Aramari", "Arataca", "Aratuípe", "Aurelino Leal", "Baianópolis", "Baixa Grande", "Banzaê", "Barra", "Barra da Estiva", "Barra do Choça", "Barra do Mendes", "Barra do Rocha", "Barreiras", "Barro Alto", "Barro Preto", "Barrocas", "Belmonte", "Belo Campo", "Biritinga", "Boa Nova", "Boa Vista do Tupim", "Bom Jesus da Lapa", "Bom Jesus da Serra", "Boninal", "Bonito", "Boquira", "Botuporã", "Brejões", "Brejolândia", "Brotas de Macaúbas", "Brumado", "Buerarema", "Buritirama", "Caatiba", "Cabaceiras do Paraguaçu", "Cachoeira", "Caculé", "Caém", "Caetanos", "Caetité", "Cafarnaum", "Cairu", "Caldeirão Grande", "Camacan", "Camaçari", "Camamu", "Campo Alegre de Lourdes", "Campo Formoso", "Canápolis", "Canarana", "Canavieiras", "Candeal", "Candeias", "Candiba", "Cândido Sales", "Cansanção", "Canudos", "Capela do Alto Alegre", "Capim Grosso", "Caraíbas", "Caravelas", "Cardeal da Silva", "Carinhanha", "Casa Nova", "Castro Alves", "Catolândia", "Catu", "Caturama", "Central", "Chorrochó", "Cícero Dantas", "Cipó", "Coaraci", "Cocos", "Conceição da Feira", "Conceição do Almeida", "Conceição do Coité", "Conceição do Jacuípe", "Conde", "Condeúba", "Contendas do Sincorá", "Coração de Maria", "Cordeiros", "Coribe", "Coronel João Sá", "Correntina", "Cotegipe", "Cravolândia", "Crisópolis", "Cristópolis", "Cruz das Almas", "Curaçá", "Dário Meira", "Dias d'Ávila", "Dom Basílio", "Dom Macedo Costa", "Elísio Medrado", "Encruzilhada", "Entre Rios", "Érico Cardoso", "Esplanada", "Euclides da Cunha", "Eunápolis", "Fátima", "Feira da Mata", "Feira de Santana", "Filadélfia", "Firmino Alves", "Floresta Azul", "Formosa do Rio Preto", "Gandu", "Gavião", "Gentio do Ouro", "Glória", "Gongogi", "Governador Mangabeira", "Guajeru", "Guanambi", "Guaratinga", "Heliópolis", "Iaçu", "Ibiassucê", "Ibicaraí", "Ibicoara", "Ibicuí", "Ibipeba", "Ibipitanga", "Ibiquera", "Ibirapitanga", "Ibirapuã", "Ibirataia", "Ibitiara", "Ibititá", "Ibotirama", "Ichu", "Igaporã", "Igrapiúna", "Iguaí", "Ilhéus", "Inhambupe", "Ipecaetá", "Ipiaú", "Ipirá", "Ipupiara", "Irajuba", "Iramaia", "Iraquara", "Irará", "Irecê", "Itabela", "Itaberaba", "Itabuna", "Itacaré", "Itaeté", "Itagi", "Itagibá", "Itagimirim", "Itaguaçu da Bahia", "Itaju do Colônia", "Itajuípe", "Itamaraju", "Itamari", "Itambé", "Itanagra", "Itanhém", "Itaparica", "Itapé", "Itapebi", "Itapetinga", "Itapicuru", "Itapitanga", "Itaquara", "Itarantim", "Itatim", "Itiruçu", "Itiúba", "Itororó", "Ituaçu", "Ituberá", "Iuiú", "Jaborandi", "Jacaraci", "Jacobina", "Jaguaquara", "Jaguarari", "Jaguaripe", "Jandaíra", "Jequié", "Jeremoabo", "Jiquiriçá", "Jitaúna", "João Dourado", "Juazeiro", "Jucuruçu", "Jussara", "Jussari", "Jussiape", "Lafaiete Coutinho", "Lagoa Real", "Laje", "Lajedão", "Lajedinho", "Lajedo do Tabocal", "Lamarão", "Lapão", "Lauro de Freitas", "Lençóis", "Licínio de Almeida", "Livramento de Nossa Senhora", "Luís Eduardo Magalhães", "Macajuba", "Macarani", "Macaúbas", "Macururé", "Madre de Deus", "Maetinga", "Maiquinique", "Mairi", "Malhada", "Malhada de Pedras", "Manoel Vitorino", "Mansidão", "Maracás", "Maragogipe", "Maraú", "Marcionílio Souza", "Mascote", "Mata de São João", "Matina", "Medeiros Neto", "Miguel Calmon", "Milagres", "Mirangaba", "Mirante", "Monte Santo", "Morpara", "Morro do Chapéu", "Mortugaba", "Mucugê", "Mucuri", "Mulungu do Morro", "Mundo Novo", "Muniz Ferreira", "Muquém de São Francisco", "Muritiba", "Mutuípe", "Nazaré", "Nilo Peçanha", "Nordestina", "Nova Canaã", "Nova Fátima", "Nova Ibiá", "Nova Itarana", "Nova Redenção", "Nova Soure", "Nova Viçosa", "Novo Horizonte", "Novo Triunfo", "Olindina", "Oliveira dos Brejinhos", "Ouriçangas", "Ourolândia", "Palmas de Monte Alto", "Palmeiras", "Paramirim", "Paratinga", "Paripiranga", "Pau Brasil", "Paulo Afonso", "Pé de Serra", "Pedrão", "Pedro Alexandre", "Piatã", "Pilão Arcado", "Pindaí", "Pindobaçu", "Pintadas", "Piraí do Norte", "Piripá", "Piritiba", "Planaltino", "Planalto", "Poções", "Pojuca", "Ponto Novo", "Porto Seguro", "Potiraguá", "Prado", "Presidente Dutra", "Presidente Jânio Quadros", "Presidente Tancredo Neves", "Queimadas", "Quijingue", "Quixabeira", "Rafael Jambeiro", "Remanso", "Retirolândia", "Riachão das Neves", "Riachão do Jacuípe", "Riacho de Santana", "Ribeira do Amparo", "Ribeira do Pombal", "Ribeirão do Largo", "Rio Real", "Rio de Contas", "Rio do Antônio", "Rio do Pires", "Rodelas", "Ruy Barbosa", "Salinas da Margarida", "Salvador", "Santa Bárbara", "Santa Brígida", "Santa Cruz Cabrália", "Santa Cruz da Vitória", "Santa Inês", "Santa Luzia", "Santa Maria da Vitória", "Santa Rita de Cássia", "Santa Teresinha", "Santaluz", "Santana", "Santanópolis", "Santo Amaro", "Santo Antônio de Jesus", "Santo Estêvão", "São Desidério", "São Domingos", "São Felipe", "São Félix", "São Félix do Coribe", "São Francisco do Conde", "São Gabriel", "São Gonçalo dos Campos", "São José da Vitória", "São José do Jacuípe", "São Miguel das Matas", "São Sebastião do Passé", "Sapeaçu", "Sátiro Dias", "Saubara", "Saúde", "Seabra", "Sebastião Laranjeiras", "Senhor do Bonfim", "Sento Sé", "Serra Dourada", "Serra Preta", "Serra do Ramalho", "Serrinha", "Serrolândia", "Simões Filho", "Sítio do Mato", "Sítio do Quinto", "Sobradinho", "Souto Soares", "Tabocas do Brejo Velho", "Tanhaçu", "Tanque Novo", "Tanquinho", "Taperoá", "Tapiramutá", "Teixeira de Freitas", "Teodoro Sampaio", "Teofilândia", "Teolândia", "Terra Nova", "Tremedal", "Tucano", "Uauá", "Ubaíra", "Ubaitaba", "Ubatã", "Uibaí", "Umburanas", "Una", "Urandi", "Uruçuca", "Utinga", "Valença", "Valente", "Várzea Nova", "Várzea da Roça", "Várzea do Poço", "Varzedo", "Vera Cruz", "Vereda", "Vitória da Conquista", "Wagner", "Wanderley", "Wenceslau Guimarães", "Xique-Xique"];
 
-  var dadosApi = { municipiosOcupados: [], contagemVagas: {} };
+  var dadosApi = { contagemVagas: {}, contagemNte: {} };
 
   document.getElementById('cpf').addEventListener('input', function(e) { var v = e.target.value.replace(/\D/g,''); if(v.length>3) v = v.slice(0,3)+'.'+v.slice(3); if(v.length>7) v = v.slice(0,7)+'.'+v.slice(7); if(v.length>11) v = v.slice(0,11)+'-'+v.slice(11,13); e.target.value = v.slice(0,14); });
   document.getElementById('telefone').addEventListener('input', function(e) { var v = e.target.value.replace(/\D/g,''); if(v.length>0) v = '('+v; if(v.length>3) v = v.slice(0,3)+') '+v.slice(3); if(v.length>10) v = v.slice(0,10)+'-'+v.slice(10,15); e.target.value = v.slice(0,15); });
+
+  function getNteLimite(nteNumero, nteFuncao) {
+    if (nteNumero === 'NTE 19' && nteFuncao === 'Ponto Focal') return 2;
+    return 1;
+  }
+
+  function isNteDisponivel(nteNumero, nteFuncao) {
+    var key = nteNumero + ' - ' + nteFuncao;
+    var count = (dadosApi.contagemNte || {})[key] || 0;
+    return count < getNteLimite(nteNumero, nteFuncao);
+  }
 
   function init() {
     fetch(APPS_SCRIPT_URL + '?action=getDadosIniciais')
       .then(r => r.json())
       .then(data => {
         dadosApi = data;
-        if (data.funcoesMunicipais) FUNCOES_MUNICIPIO = data.funcoesMunicipais;
         if (data.vagasLimites) VAGAS_LIMITES = data.vagasLimites;
         popularFuncoes();
-        popularMunicipios();
       })
       .catch(() => { document.getElementById('funcao').innerHTML = '<option value="" disabled selected>Erro ao carregar</option>'; });
   }
@@ -229,53 +248,132 @@
   function popularFuncoes() {
     var sel = document.getElementById('funcao');
     sel.innerHTML = '<option value="" disabled selected>Selecione sua função</option>';
-    var groupMun = document.createElement('optgroup'); groupMun.label = "Funções Municipais";
-    FUNCOES_MUNICIPIO.forEach(function(f) { groupMun.appendChild(new Option(f, f)); });
-    sel.appendChild(groupMun);
-    var groupInst = document.createElement('optgroup'); groupInst.label = "Instituições e Setores";
+
+    var groupNte = document.createElement('optgroup');
+    groupNte.label = 'NTE';
+    groupNte.appendChild(new Option('NTE', 'NTE'));
+    sel.appendChild(groupNte);
+
+    var groupInst = document.createElement('optgroup');
+    groupInst.label = 'Instituições e Setores';
     Object.keys(VAGAS_LIMITES).forEach(function(f) {
-      var count = dadosApi.contagemVagas[f] || 0; var limit = VAGAS_LIMITES[f];
+      var count = (dadosApi.contagemVagas || {})[f] || 0;
+      var limit = VAGAS_LIMITES[f];
       var opt = new Option(f, f);
-      if (count >= limit) { opt.disabled = true; opt.textContent = f + " (VAGAS ESGOTADAS)"; }
+      if (count >= limit) { opt.disabled = true; opt.textContent = f + ' (VAGAS ESGOTADAS)'; }
       groupInst.appendChild(opt);
     });
     sel.appendChild(groupInst);
   }
 
-  function popularMunicipios() {
-    var sel = document.getElementById('municipio');
-    sel.innerHTML = '<option value="" disabled selected>Selecione seu município</option>';
-    TODOS_MUNICIPIOS.forEach(function(m) { sel.appendChild(new Option(m, m)); });
+  function popularNteNumeros() {
+    var sel = document.getElementById('nte-numero');
+    sel.innerHTML = '<option value="" disabled selected>Selecione o NTE</option>';
+    NTE_LISTA.forEach(function(nte) {
+      var todasEsgotadas = NTE_FUNCOES.every(function(f) { return !isNteDisponivel(nte, f); });
+      var opt = new Option(nte, nte);
+      if (todasEsgotadas) { opt.disabled = true; opt.textContent = nte + ' (VAGAS ESGOTADAS)'; }
+      sel.appendChild(opt);
+    });
+  }
+
+  function popularNteFuncoes(nteNumero) {
+    var sel = document.getElementById('nte-funcao');
+    sel.innerHTML = '<option value="" disabled selected>Selecione sua função</option>';
+    NTE_FUNCOES.forEach(function(funcao) {
+      var opt = new Option(funcao, funcao);
+      if (!isNteDisponivel(nteNumero, funcao)) {
+        opt.disabled = true;
+        opt.textContent = funcao + ' (VAGA ESGOTADA)';
+      }
+      sel.appendChild(opt);
+    });
   }
 
   document.getElementById('funcao').addEventListener('change', function() {
-    var val = this.value; var divMun = document.getElementById('f-municipio');
-    if (FUNCOES_MUNICIPIO.indexOf(val) !== -1) { divMun.style.display = 'flex'; } else { divMun.style.display = 'none'; document.getElementById('municipio').value = ''; }
+    var val = this.value;
+    var divNteNum = document.getElementById('f-nte-numero');
+    var divNteFun = document.getElementById('f-nte-funcao');
+    if (val === 'NTE') {
+      popularNteNumeros();
+      divNteNum.style.display = 'flex';
+      divNteFun.style.display = 'none';
+      document.getElementById('nte-numero').value = '';
+      document.getElementById('nte-funcao').value = '';
+    } else {
+      divNteNum.style.display = 'none';
+      divNteFun.style.display = 'none';
+      document.getElementById('nte-numero').value = '';
+      document.getElementById('nte-funcao').value = '';
+    }
+  });
+
+  document.getElementById('nte-numero').addEventListener('change', function() {
+    var nteNumero = this.value;
+    var divNteFun = document.getElementById('f-nte-funcao');
+    if (nteNumero) {
+      popularNteFuncoes(nteNumero);
+      divNteFun.style.display = 'flex';
+      document.getElementById('nte-funcao').value = '';
+    } else {
+      divNteFun.style.display = 'none';
+    }
   });
 
   function validarCPF(cpf) { cpf = cpf.replace(/\D/g,''); if(cpf.length!==11||/^(\d)\1+$/.test(cpf)) return false; var s=0, r, i; for(i=0;i<9;i++) s+=parseInt(cpf[i])*(10-i); r=11-(s%11); if(r>=10) r=0; if(r!==parseInt(cpf[9])) return false; s=0; for(i=0;i<10;i++) s+=parseInt(cpf[i])*(11-i); r=11-(s%11); if(r>=10) r=0; return r===parseInt(cpf[10]); }
   function setInvalid(id, invalid) { document.getElementById('f-'+id).classList.toggle('invalid', invalid); }
 
   document.getElementById('form').addEventListener('submit', function(e) {
-    e.preventDefault(); var toast = document.getElementById('toast'); toast.className = 'toast';
-    var nome = document.getElementById('nome').value.trim(); var cpf = document.getElementById('cpf').value.trim();
-    var telefone = document.getElementById('telefone').value.trim(); var email = document.getElementById('email').value.trim();
-    var municipio = document.getElementById('municipio').value; var funcao = document.getElementById('funcao').value;
+    e.preventDefault();
+    var toast = document.getElementById('toast'); toast.className = 'toast';
+    var nome = document.getElementById('nome').value.trim();
+    var cpf = document.getElementById('cpf').value.trim();
+    var telefone = document.getElementById('telefone').value.trim();
+    var email = document.getElementById('email').value.trim();
+    var funcao = document.getElementById('funcao').value;
+    var nteNumero = document.getElementById('nte-numero').value;
+    var nteFuncao = document.getElementById('nte-funcao').value;
     var ok = true;
-    setInvalid('nome', !nome); if(!nome) ok=false; setInvalid('cpf', !validarCPF(cpf)); if(!validarCPF(cpf)) ok=false;
-    var telNum = telefone.replace(/\D/g,''); setInvalid('telefone', telNum.length<10); if(telNum.length<10) ok=false;
-    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); setInvalid('email', !emailOk); if(!emailOk) ok=false;
-    if (FUNCOES_MUNICIPIO.indexOf(funcao) !== -1) { setInvalid('municipio', !municipio); if(!municipio) ok=false; }
-    setInvalid('funcao', !funcao); if(!funcao) ok=false;
-    if(!ok) return;
+
+    setInvalid('nome', !nome); if (!nome) ok = false;
+    setInvalid('cpf', !validarCPF(cpf)); if (!validarCPF(cpf)) ok = false;
+    var telNum = telefone.replace(/\D/g,''); setInvalid('telefone', telNum.length < 10); if (telNum.length < 10) ok = false;
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); setInvalid('email', !emailOk); if (!emailOk) ok = false;
+    setInvalid('funcao', !funcao); if (!funcao) ok = false;
+
+    if (funcao === 'NTE') {
+      setInvalid('nte-numero', !nteNumero); if (!nteNumero) ok = false;
+      setInvalid('nte-funcao', !nteFuncao); if (!nteFuncao) ok = false;
+    }
+
+    if (!ok) return;
+
     var btn = document.getElementById('btn-submit'); btn.classList.add('loading'); btn.disabled = true;
+
+    var postData = { action: 'inscrever', nome: nome, cpf: cpf, telefone: telefone, email: email };
+    if (funcao === 'NTE') {
+      postData.nteNumero = nteNumero;
+      postData.nteFuncao = nteFuncao;
+    } else {
+      postData.funcao = funcao;
+    }
+
     fetch(APPS_SCRIPT_URL, {
-      method: 'POST', body: JSON.stringify({ action: 'inscrever', nome: nome, cpf: cpf, telefone: telefone, email: email, municipio: municipio, funcao: funcao })
+      method: 'POST', body: JSON.stringify(postData)
     })
     .then(r => r.json())
     .then(data => {
-      if (data.success) { toast.textContent = 'Inscrição realizada com sucesso!'; toast.className = 'toast success'; document.getElementById('form').reset(); document.getElementById('f-municipio').style.display = 'none'; init(); }
-      else { toast.textContent = data.message || 'Erro ao enviar.'; toast.className = 'toast error'; }
+      if (data.success) {
+        toast.textContent = 'Inscrição realizada com sucesso!';
+        toast.className = 'toast success';
+        document.getElementById('form').reset();
+        document.getElementById('f-nte-numero').style.display = 'none';
+        document.getElementById('f-nte-funcao').style.display = 'none';
+        init();
+      } else {
+        toast.textContent = data.message || 'Erro ao enviar.';
+        toast.className = 'toast error';
+      }
     })
     .catch(() => { toast.textContent = 'Erro de conexão.'; toast.className = 'toast error'; })
     .then(() => { btn.classList.remove('loading'); btn.disabled = false; });

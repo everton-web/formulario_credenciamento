@@ -265,7 +265,7 @@
     groupInst.appendChild(new Option('NTE', 'NTE'));
 
     // Secretário(a) Municipal — fixo com nome correto (independe da planilha)
-    groupInst.appendChild(new Option('Secretário(a) Municipal', 'Secretário(a) Municipal'));
+    groupInst.appendChild(new Option('Secretaria Municipal', 'Secretaria Municipal'));
 
     Object.keys(VAGAS_LIMITES).forEach(function(f) {
       if (/^NTE/.test(f)) return;
@@ -335,7 +335,7 @@
     document.getElementById('nte-numero').value = '';
     document.getElementById('nte-funcao').value = '';
 
-    if (val === 'Secretário(a) Municipal') {
+    if (val === 'Secretaria Municipal') {
       popularMunFuncoes();
       divMunFuncao.style.display = 'flex';
     } else if (val === 'NTE') {
@@ -391,7 +391,7 @@
     var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); setInvalid('email', !emailOk); if (!emailOk) ok = false;
     setInvalid('funcao', !funcao); if (!funcao) ok = false;
 
-    if (funcao === 'Secretário(a) Municipal') {
+    if (funcao === 'Secretaria Municipal') {
       setInvalid('mun-funcao', !munFuncao); if (!munFuncao) ok = false;
       setInvalid('municipio', !municipio); if (!municipio) ok = false;
     }
@@ -408,7 +408,7 @@
     if (funcao === 'NTE') {
       postData.nteNumero = nteNumero;
       postData.nteFuncao = nteFuncao;
-    } else if (funcao === 'Secretário(a) Municipal') {
+    } else if (funcao === 'Secretaria Municipal') {
       postData.funcao    = munFuncao;   // "Secretário(a) Municipal" ou "Técnico Municipal"
       postData.municipio = municipio;
     } else {

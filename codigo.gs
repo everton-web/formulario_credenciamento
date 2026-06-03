@@ -69,9 +69,20 @@ function carregarFuncoes() {
     var limite = parseInt(dados[i][1]) || 0;
     var tipo = String(dados[i][2] || '').trim();
     if (!nome || tipo !== 'Institucional') continue;
+    // NTE é tratado separadamente via NTE_LISTA
+    if (/^NTE/.test(nome)) continue;
     vagasLimites[nome] = limite;
   }
   return { vagasLimites: vagasLimites };
+}
+
+// Rodar uma vez no Apps Script para limpar entradas antigas da aba Funcoes
+function resetarFuncoesSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_FUNCOES);
+  if (sheet) ss.deleteSheet(sheet);
+  getFuncoesSheet();
+  SpreadsheetApp.getUi().alert('Aba Funcoes atualizada com sucesso!');
 }
 
 function doGet(e) {

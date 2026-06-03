@@ -249,14 +249,11 @@
     var sel = document.getElementById('funcao');
     sel.innerHTML = '<option value="" disabled selected>Selecione sua função</option>';
 
-    var groupNte = document.createElement('optgroup');
-    groupNte.label = 'NTE';
-    groupNte.appendChild(new Option('NTE', 'NTE'));
-    sel.appendChild(groupNte);
-
     var groupInst = document.createElement('optgroup');
     groupInst.label = 'Instituições e Setores';
+    groupInst.appendChild(new Option('NTE', 'NTE'));
     Object.keys(VAGAS_LIMITES).forEach(function(f) {
+      if (/^NTE/.test(f)) return; // NTE tratado separadamente
       var count = (dadosApi.contagemVagas || {})[f] || 0;
       var limit = VAGAS_LIMITES[f];
       var opt = new Option(f, f);

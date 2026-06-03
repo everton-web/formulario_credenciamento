@@ -12,11 +12,6 @@ var NTE_LISTA = [
   'NTE 26', 'NTE 27'
 ];
 
-function getNteLimite(nteNumero, nteFuncao) {
-  if (nteNumero === 'NTE 19' && nteFuncao === 'Ponto Focal') return 2;
-  return 1;
-}
-
 function getFuncoesSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(SHEET_FUNCOES);
@@ -24,6 +19,7 @@ function getFuncoesSheet() {
     sheet = ss.insertSheet(SHEET_FUNCOES);
     sheet.appendRow(['Nome', 'Limite', 'Tipo']);
     sheet.getRange(1, 1, 1, 3).setFontWeight('bold').setBackground('#1a3a8a').setFontColor('#ffffff');
+
     var defaults = [
       ['CAV/DIE/SGINF', 8, 'Institucional'],
       ['Secretário Municipal', 417, 'Institucional'],
@@ -51,6 +47,14 @@ function getFuncoesSheet() {
       ['UPB', 3, 'Institucional'],
       ['FGV/DGPE', 5, 'Institucional']
     ];
+
+    // Entradas NTE: 1 Diretor + 1 Ponto Focal por NTE; NTE 19 tem 2 Ponto Focal
+    for (var n = 0; n < NTE_LISTA.length; n++) {
+      var nte = NTE_LISTA[n];
+      defaults.push([nte + ' - Diretor', 1, 'NTE']);
+      defaults.push([nte + ' - Ponto Focal', nte === 'NTE 19' ? 2 : 1, 'NTE']);
+    }
+
     sheet.getRange(2, 1, defaults.length, 3).setValues(defaults);
     sheet.setColumnWidth(1, 300);
     sheet.setColumnWidth(2, 80);
@@ -64,25 +68,21 @@ function carregarFuncoes() {
   var sheet = getFuncoesSheet();
   var dados = sheet.getDataRange().getValues();
   var vagasLimites = {};
+  var nteLimites = {};
+
   for (var i = 1; i < dados.length; i++) {
     var nome = String(dados[i][0] || '').trim();
     var limite = parseInt(dados[i][1]) || 0;
     var tipo = String(dados[i][2] || '').trim();
-    if (!nome || tipo !== 'Institucional') continue;
-    // NTE é tratado separadamente via NTE_LISTA
-    if (/^NTE/.test(nome)) continue;
-    vagasLimites[nome] = limite;
-  }
-  return { vagasLimites: vagasLimites };
-}
+    if (!nome) continue;
 
-// Rodar uma vez no Apps Script para limpar entradas antigas da aba Funcoes
-function resetarFuncoesSheet() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(SHEET_FUNCOES);
-  if (sheet) ss.deleteSheet(sheet);
-  getFuncoesSheet();
-  SpreadsheetApp.getUi().alert('Aba Funcoes atualizada com sucesso!');
+    if (tipo === 'Institucional') {
+      vagasLimites[nome] = limite;
+    } else if (tipo === 'NTE') {
+      nteLimites[nome] = limite;
+    }
+  }
+  return { vagasLimites: vagasLimites, nteLimites: nteLimites };
 }
 
 function doGet(e) {
@@ -95,20 +95,28 @@ function doGet(e) {
     var contagemVagas = {};
     var contagemNte = {};
 
+    var municipiosSecretario = [];
+
     for (var i = 1; i < dados.length; i++) {
       var funcao = String(dados[i][6] || '').trim();
+      var municipio = String(dados[i][4] || '').trim();
       if (!funcao) continue;
       if (/^NTE \d+/.test(funcao)) {
         contagemNte[funcao] = (contagemNte[funcao] || 0) + 1;
       } else {
         contagemVagas[funcao] = (contagemVagas[funcao] || 0) + 1;
       }
+      if (funcao === 'Secretário Municipal' && municipio) {
+        municipiosSecretario.push(municipio);
+      }
     }
 
     return jsonResponse({
       contagemVagas: contagemVagas,
       contagemNte: contagemNte,
-      vagasLimites: funcoes.vagasLimites
+      vagasLimites: funcoes.vagasLimites,
+      nteLimites: funcoes.nteLimites,
+      municipiosSecretario: municipiosSecretario
     });
   }
 
@@ -125,6 +133,7 @@ function doPost(e) {
 
     var sheet = getSheet();
     var dados = sheet.getDataRange().getValues();
+    var funcoes = carregarFuncoes();
 
     // Verifica CPF duplicado
     for (var j = 1; j < dados.length; j++) {
@@ -137,7 +146,7 @@ function doPost(e) {
 
     if (payload.nteNumero && payload.nteFuncao) {
       funcaoFinal = payload.nteNumero + ' - ' + payload.nteFuncao;
-      var limite = getNteLimite(payload.nteNumero, payload.nteFuncao);
+      var limite = funcoes.nteLimites[funcaoFinal] !== undefined ? funcoes.nteLimites[funcaoFinal] : 1;
       var countNte = 0;
       for (var i = 1; i < dados.length; i++) {
         if (String(dados[i][6]).trim() === funcaoFinal) countNte++;
@@ -150,7 +159,23 @@ function doPost(e) {
       }
     } else {
       funcaoFinal = payload.funcao;
-      var funcoes = carregarFuncoes();
+
+      // Secretário Municipal: validar unicidade por município
+      if (funcaoFinal === 'Secretário Municipal') {
+        if (!payload.municipio) {
+          return jsonResponse({ success: false, message: 'Selecione o município.' });
+        }
+        for (var m = 1; m < dados.length; m++) {
+          if (String(dados[m][6]).trim() === 'Secretário Municipal' &&
+              String(dados[m][4]).trim() === payload.municipio) {
+            return jsonResponse({
+              success: false,
+              message: 'O município "' + payload.municipio + '" já possui um Secretário Municipal inscrito.'
+            });
+          }
+        }
+      }
+
       var limiteInst = funcoes.vagasLimites[funcaoFinal];
       if (limiteInst !== undefined && limiteInst > 0) {
         var countInst = 0;
@@ -172,7 +197,7 @@ function doPost(e) {
       payload.nome,
       payload.cpf,
       payload.telefone,
-      '',
+      payload.municipio || '',
       payload.email,
       funcaoFinal
     ]);
@@ -216,43 +241,36 @@ function atualizarPainelVagas() {
     .setFontColor('#ffffff');
 
   var inscSheet = getSheet();
-  var dados = inscSheet.getDataRange().getValues();
+  var dadosInsc = inscSheet.getDataRange().getValues();
   var contagem = {};
-  for (var i = 1; i < dados.length; i++) {
-    var f = String(dados[i][6] || '').trim();
+  for (var i = 1; i < dadosInsc.length; i++) {
+    var f = String(dadosInsc[i][6] || '').trim();
     if (f) contagem[f] = (contagem[f] || 0) + 1;
   }
 
+  var funcoesData = carregarFuncoes();
   var rows = [];
 
   // Funções institucionais
-  var funcoesData = carregarFuncoes();
-  var funcoes = Object.keys(funcoesData.vagasLimites);
-  for (var k = 0; k < funcoes.length; k++) {
-    var nome = funcoes[k];
+  var nomesInst = Object.keys(funcoesData.vagasLimites);
+  for (var k = 0; k < nomesInst.length; k++) {
+    var nome = nomesInst[k];
     var limiteInst = funcoesData.vagasLimites[nome];
     var inscInst = contagem[nome] || 0;
-    var dispInst = Math.max(0, limiteInst - inscInst);
-    rows.push([nome, limiteInst, inscInst, dispInst]);
+    rows.push([nome, limiteInst, inscInst, Math.max(0, limiteInst - inscInst)]);
   }
 
-  // Entradas NTE (Diretor e Ponto Focal por número)
-  var nteFuncoes = ['Diretor', 'Ponto Focal'];
-  for (var n = 0; n < NTE_LISTA.length; n++) {
-    var nte = NTE_LISTA[n];
-    for (var fn = 0; fn < nteFuncoes.length; fn++) {
-      var funcaoNte = nteFuncoes[fn];
-      var keyNte = nte + ' - ' + funcaoNte;
-      var limiteNte = getNteLimite(nte, funcaoNte);
-      var inscNte = contagem[keyNte] || 0;
-      var dispNte = Math.max(0, limiteNte - inscNte);
-      rows.push([keyNte, limiteNte, inscNte, dispNte]);
-    }
+  // Entradas NTE (lidas da aba Funcoes)
+  var nomesNte = Object.keys(funcoesData.nteLimites).sort();
+  for (var m = 0; m < nomesNte.length; m++) {
+    var nomeNte = nomesNte[m];
+    var limiteNte = funcoesData.nteLimites[nomeNte];
+    var inscNte = contagem[nomeNte] || 0;
+    rows.push([nomeNte, limiteNte, inscNte, Math.max(0, limiteNte - inscNte)]);
   }
 
   if (rows.length > 0) {
-    var dataRange = sheet.getRange(2, 1, rows.length, 4);
-    dataRange.setValues(rows);
+    sheet.getRange(2, 1, rows.length, 4).setValues(rows);
     for (var r = 0; r < rows.length; r++) {
       var cor = rows[r][3] === 0 ? '#fce8e8' : (rows[r][3] <= 2 ? '#fff3cd' : '#ffffff');
       sheet.getRange(r + 2, 1, 1, 4).setBackground(cor);
@@ -260,9 +278,9 @@ function atualizarPainelVagas() {
   }
 
   var totalRow = rows.length + 2;
+  var totalLimite   = rows.reduce(function(s, r) { return s + r[1]; }, 0);
   var totalInscritos = rows.reduce(function(s, r) { return s + r[2]; }, 0);
-  var totalLimite = rows.reduce(function(s, r) { return s + r[1]; }, 0);
-  var totalDisp = rows.reduce(function(s, r) { return s + r[3]; }, 0);
+  var totalDisp     = rows.reduce(function(s, r) { return s + r[3]; }, 0);
   sheet.getRange(totalRow, 1, 1, 4)
     .setValues([['TOTAL', totalLimite, totalInscritos, totalDisp]])
     .setFontWeight('bold')
@@ -285,6 +303,16 @@ function onEdit(e) {
   if (sheetName === SHEET_NAME || sheetName === SHEET_FUNCOES) {
     atualizarPainelVagas();
   }
+}
+
+// Rodar uma vez no Apps Script para recriar a aba Funcoes com os dados atualizados
+function resetarFuncoesSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_FUNCOES);
+  if (sheet) ss.deleteSheet(sheet);
+  getFuncoesSheet();
+  atualizarPainelVagas();
+  SpreadsheetApp.getUi().alert('Aba Funcoes atualizada com sucesso!');
 }
 
 function jsonResponse(obj) {

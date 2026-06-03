@@ -199,7 +199,8 @@ function doPost(e) {
       payload.telefone,
       payload.municipio || '',
       payload.email,
-      funcaoFinal
+      funcaoFinal,
+      payload.nteNumero || ''
     ]);
 
     atualizarPainelVagas();
@@ -215,8 +216,8 @@ function getSheet() {
   var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-    sheet.appendRow(['Data/Hora', 'Nome', 'CPF', 'Telefone', 'Municipio', 'E-mail', 'Funcao']);
-    sheet.getRange(1, 1, 1, 7)
+    sheet.appendRow(['Data/Hora', 'Nome', 'CPF', 'Telefone', 'Municipio', 'E-mail', 'Funcao', 'NTE']);
+    sheet.getRange(1, 1, 1, 8)
       .setFontWeight('bold')
       .setBackground('#1a3a8a')
       .setFontColor('#ffffff');

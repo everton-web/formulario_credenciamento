@@ -18,6 +18,7 @@ function getFuncoesSheet() {
       ['CAV/DIE/SGINF', 8, 'Institucional'],
       ['Agentes Pedagógicos Municipais', 417, 'Institucional'],
       ['NTE', 54, 'Institucional'],
+      ['NTE 19', 3, 'Institucional'],
       ['IAT', 10, 'Institucional'],
       ['SUPED', 10, 'Institucional'],
       ['SUPROT', 5, 'Institucional'],

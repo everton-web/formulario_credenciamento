@@ -22,7 +22,8 @@ function getFuncoesSheet() {
 
     var defaults = [
       ['CAV/DIE/SGINF', 8, 'Institucional'],
-      ['Secretário Municipal', 417, 'Institucional'],
+      ['Secretário(a) Municipal', 417, 'Institucional'],
+      ['Técnico Municipal', 417, 'Institucional'],
       ['IAT', 10, 'Institucional'],
       ['SUPED', 10, 'Institucional'],
       ['SUPROT', 5, 'Institucional'],
@@ -48,10 +49,10 @@ function getFuncoesSheet() {
       ['FGV/DGPE', 5, 'Institucional']
     ];
 
-    // Entradas NTE: 1 Diretor + 1 Ponto Focal por NTE; NTE 19 tem 2 Ponto Focal
+    // Entradas NTE: 1 Diretor(a) + 1 Ponto Focal por NTE; NTE 19 tem 2 Ponto Focal
     for (var n = 0; n < NTE_LISTA.length; n++) {
       var nte = NTE_LISTA[n];
-      defaults.push([nte + ' - Diretor', 1, 'NTE']);
+      defaults.push([nte + ' - Diretor(a)', 1, 'NTE']);
       defaults.push([nte + ' - Ponto Focal', nte === 'NTE 19' ? 2 : 1, 'NTE']);
     }
 
@@ -95,19 +96,21 @@ function doGet(e) {
     var contagemVagas = {};
     var contagemNte = {};
 
-    var municipiosSecretario = [];
+    var municipiosOcupados = { 'Secretário(a) Municipal': [], 'Técnico Municipal': [] };
 
     for (var i = 1; i < dados.length; i++) {
-      var funcao = String(dados[i][6] || '').trim();
+      var funcao    = String(dados[i][6] || '').trim();
+      var nteColuna = String(dados[i][7] || '').trim();
       var municipio = String(dados[i][4] || '').trim();
       if (!funcao) continue;
-      if (/^NTE \d+/.test(funcao)) {
-        contagemNte[funcao] = (contagemNte[funcao] || 0) + 1;
+      if (nteColuna) {
+        var nteKey = nteColuna + ' - ' + funcao;
+        contagemNte[nteKey] = (contagemNte[nteKey] || 0) + 1;
       } else {
         contagemVagas[funcao] = (contagemVagas[funcao] || 0) + 1;
       }
-      if (funcao === 'Secretário Municipal' && municipio) {
-        municipiosSecretario.push(municipio);
+      if ((funcao === 'Secretário(a) Municipal' || funcao === 'Técnico Municipal') && municipio) {
+        municipiosOcupados[funcao].push(municipio);
       }
     }
 
@@ -116,7 +119,7 @@ function doGet(e) {
       contagemNte: contagemNte,
       vagasLimites: funcoes.vagasLimites,
       nteLimites: funcoes.nteLimites,
-      municipiosSecretario: municipiosSecretario
+      municipiosOcupados: municipiosOcupados
     });
   }
 
@@ -145,11 +148,13 @@ function doPost(e) {
     var funcaoFinal;
 
     if (payload.nteNumero && payload.nteFuncao) {
-      funcaoFinal = payload.nteNumero + ' - ' + payload.nteFuncao;
-      var limite = funcoes.nteLimites[funcaoFinal] !== undefined ? funcoes.nteLimites[funcaoFinal] : 1;
+      funcaoFinal = payload.nteFuncao; // "Diretor(a)" ou "Ponto Focal"
+      var nteKey = payload.nteNumero + ' - ' + payload.nteFuncao;
+      var limite = funcoes.nteLimites[nteKey] !== undefined ? funcoes.nteLimites[nteKey] : 1;
       var countNte = 0;
       for (var i = 1; i < dados.length; i++) {
-        if (String(dados[i][6]).trim() === funcaoFinal) countNte++;
+        if (String(dados[i][6]).trim() === payload.nteFuncao &&
+            String(dados[i][7]).trim() === payload.nteNumero) countNte++;
       }
       if (countNte >= limite) {
         return jsonResponse({
@@ -160,17 +165,17 @@ function doPost(e) {
     } else {
       funcaoFinal = payload.funcao;
 
-      // Secretário Municipal: validar unicidade por município
-      if (funcaoFinal === 'Secretário Municipal') {
+      // Secretário(a) Municipal e Técnico Municipal: 1 por município por função
+      if (funcaoFinal === 'Secretário(a) Municipal' || funcaoFinal === 'Técnico Municipal') {
         if (!payload.municipio) {
           return jsonResponse({ success: false, message: 'Selecione o município.' });
         }
         for (var m = 1; m < dados.length; m++) {
-          if (String(dados[m][6]).trim() === 'Secretário Municipal' &&
+          if (String(dados[m][6]).trim() === funcaoFinal &&
               String(dados[m][4]).trim() === payload.municipio) {
             return jsonResponse({
               success: false,
-              message: 'O município "' + payload.municipio + '" já possui um Secretário Municipal inscrito.'
+              message: 'O município "' + payload.municipio + '" já possui um(a) ' + funcaoFinal + ' inscrito(a).'
             });
           }
         }
@@ -245,8 +250,11 @@ function atualizarPainelVagas() {
   var dadosInsc = inscSheet.getDataRange().getValues();
   var contagem = {};
   for (var i = 1; i < dadosInsc.length; i++) {
-    var f = String(dadosInsc[i][6] || '').trim();
-    if (f) contagem[f] = (contagem[f] || 0) + 1;
+    var f   = String(dadosInsc[i][6] || '').trim();
+    var nte = String(dadosInsc[i][7] || '').trim();
+    if (!f) continue;
+    var key = nte ? nte + ' - ' + f : f;
+    contagem[key] = (contagem[key] || 0) + 1;
   }
 
   var funcoesData = carregarFuncoes();

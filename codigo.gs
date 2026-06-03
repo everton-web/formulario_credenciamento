@@ -104,8 +104,7 @@ function doGet(e) {
       var municipio = String(dados[i][4] || '').trim();
       if (!funcao) continue;
       if (nteColuna) {
-        var nteKey = nteColuna + ' - ' + funcao;
-        contagemNte[nteKey] = (contagemNte[nteKey] || 0) + 1;
+        contagemNte[funcao] = (contagemNte[funcao] || 0) + 1;
       } else {
         contagemVagas[funcao] = (contagemVagas[funcao] || 0) + 1;
       }
@@ -148,13 +147,12 @@ function doPost(e) {
     var funcaoFinal;
 
     if (payload.nteNumero && payload.nteFuncao) {
-      funcaoFinal = payload.nteFuncao; // "Diretor(a)" ou "Ponto Focal"
-      var nteKey = payload.nteNumero + ' - ' + payload.nteFuncao;
+      funcaoFinal = payload.nteNumero + ' - ' + payload.nteFuncao; // "NTE 01 - Diretor(a)"
+      var nteKey = funcaoFinal;
       var limite = funcoes.nteLimites[nteKey] !== undefined ? funcoes.nteLimites[nteKey] : 1;
       var countNte = 0;
       for (var i = 1; i < dados.length; i++) {
-        if (String(dados[i][6]).trim() === payload.nteFuncao &&
-            String(dados[i][7]).trim() === payload.nteNumero) countNte++;
+        if (String(dados[i][6]).trim() === funcaoFinal) countNte++;
       }
       if (countNte >= limite) {
         return jsonResponse({
@@ -251,10 +249,8 @@ function atualizarPainelVagas() {
   var contagem = {};
   for (var i = 1; i < dadosInsc.length; i++) {
     var f   = String(dadosInsc[i][6] || '').trim();
-    var nte = String(dadosInsc[i][7] || '').trim();
     if (!f) continue;
-    var key = nte ? nte + ' - ' + f : f;
-    contagem[key] = (contagem[key] || 0) + 1;
+    contagem[f] = (contagem[f] || 0) + 1;
   }
 
   var funcoesData = carregarFuncoes();
@@ -312,6 +308,28 @@ function onEdit(e) {
   if (sheetName === SHEET_NAME || sheetName === SHEET_FUNCOES) {
     atualizarPainelVagas();
   }
+}
+
+// Rodar uma vez para corrigir entradas NTE que foram salvas sem o número do NTE na coluna Funcao
+function migrarFuncoesNTE() {
+  var sheet = getSheet();
+  var dados = sheet.getDataRange().getValues();
+  var corrigidas = 0;
+
+  for (var i = 1; i < dados.length; i++) {
+    var funcao = String(dados[i][6] || '').trim();
+    var nte    = String(dados[i][7] || '').trim();
+
+    // Linha NTE antiga: tem NTE preenchido, mas Funcao não começa com "NTE"
+    if (nte && !funcao.startsWith('NTE')) {
+      var novaFuncao = nte + ' - ' + funcao;
+      sheet.getRange(i + 1, 7).setValue(novaFuncao);
+      corrigidas++;
+    }
+  }
+
+  atualizarPainelVagas();
+  SpreadsheetApp.getUi().alert(corrigidas + ' linha(s) corrigida(s) com sucesso!');
 }
 
 // Rodar uma vez no Apps Script para recriar a aba Funcoes com os dados atualizados

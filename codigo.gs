@@ -96,7 +96,7 @@ function doGet(e) {
     var contagemVagas = {};
     var contagemNte = {};
 
-    var municipiosOcupados = { 'Secretário(a) Municipal': [], 'Técnico Municipal': [] };
+    var municipiosOcupados = [];
 
     for (var i = 1; i < dados.length; i++) {
       var funcao    = String(dados[i][6] || '').trim();
@@ -109,7 +109,7 @@ function doGet(e) {
         contagemVagas[funcao] = (contagemVagas[funcao] || 0) + 1;
       }
       if ((funcao === 'Secretário(a) Municipal' || funcao === 'Técnico Municipal') && municipio) {
-        municipiosOcupados[funcao].push(municipio);
+        municipiosOcupados.push(municipio);
       }
     }
 
@@ -163,17 +163,18 @@ function doPost(e) {
     } else {
       funcaoFinal = payload.funcao;
 
-      // Secretário(a) Municipal e Técnico Municipal: 1 por município por função
+      // Secretário(a) Municipal e Técnico Municipal: apenas 1 representante (de qualquer uma das 2 funções) por município
       if (funcaoFinal === 'Secretário(a) Municipal' || funcaoFinal === 'Técnico Municipal') {
         if (!payload.municipio) {
           return jsonResponse({ success: false, message: 'Selecione o município.' });
         }
         for (var m = 1; m < dados.length; m++) {
-          if (String(dados[m][6]).trim() === funcaoFinal &&
+          var funcaoM = String(dados[m][6]).trim();
+          if ((funcaoM === 'Secretário(a) Municipal' || funcaoM === 'Técnico Municipal') &&
               String(dados[m][4]).trim() === payload.municipio) {
             return jsonResponse({
               success: false,
-              message: 'O município "' + payload.municipio + '" já possui um(a) ' + funcaoFinal + ' inscrito(a).'
+              message: 'O município "' + payload.municipio + '" já possui um representante municipal inscrito(a).'
             });
           }
         }

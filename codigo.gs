@@ -371,7 +371,7 @@ function migrarFuncoesNTE() {
     }
   }
 
-  atualizarPainelVagas();
+  atualizarTudo();
   SpreadsheetApp.getUi().alert(corrigidas + ' linha(s) corrigida(s) com sucesso!');
 }
 
@@ -381,8 +381,75 @@ function resetarFuncoesSheet() {
   var sheet = ss.getSheetByName(SHEET_FUNCOES);
   if (sheet) ss.deleteSheet(sheet);
   getFuncoesSheet();
-  atualizarPainelVagas();
-  SpreadsheetApp.getUi().alert('Aba Funcoes atualizada com sucesso!');
+  atualizarTudo();
+  SpreadsheetApp.getUi().alert('Aba Funções atualizada com sucesso!');
+}
+
+function atualizarPainelMunicipios() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_MUNICIPIOS);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_MUNICIPIOS);
+  } else {
+    sheet.clearContents();
+    sheet.clearFormats();
+  }
+
+  // Mapeia municípios que já têm representante inscrito
+  var inscSheet = getSheet();
+  var dadosInsc = inscSheet.getDataRange().getValues();
+  var repMunicipal = {};
+  for (var i = 1; i < dadosInsc.length; i++) {
+    var funcao    = String(dadosInsc[i][6] || '').trim();
+    var municipio = String(dadosInsc[i][4] || '').trim();
+    var nome      = String(dadosInsc[i][1] || '').trim();
+    if ((funcao === 'Secretário(a) Municipal' || funcao === 'Técnico Municipal') && municipio) {
+      repMunicipal[municipio] = { funcao: funcao, nome: nome };
+    }
+  }
+
+  var pendentes = [];
+  var inscritos = [];
+  for (var j = 0; j < TODOS_MUNICIPIOS.length; j++) {
+    var mun = TODOS_MUNICIPIOS[j];
+    if (repMunicipal[mun]) {
+      inscritos.push([mun, 'Inscrito', repMunicipal[mun].funcao, repMunicipal[mun].nome]);
+    } else {
+      pendentes.push([mun, 'Pendente', '-', '-']);
+    }
+  }
+
+  // Cabeçalho
+  sheet.getRange(1, 1, 1, 4)
+    .setValues([['Município', 'Status', 'Função', 'Representante']])
+    .setFontWeight('bold')
+    .setBackground('#1a3a8a')
+    .setFontColor('#ffffff');
+
+  // Pendentes primeiro, depois inscritos
+  var rows = pendentes.concat(inscritos);
+  if (rows.length > 0) {
+    sheet.getRange(2, 1, rows.length, 4).setValues(rows);
+    for (var r = 0; r < pendentes.length; r++) {
+      sheet.getRange(r + 2, 1, 1, 4).setBackground('#fce8e8');
+    }
+    for (var s = 0; s < inscritos.length; s++) {
+      sheet.getRange(pendentes.length + s + 2, 1, 1, 4).setBackground('#e8f5e9');
+    }
+  }
+
+  // Rodapé com totais
+  var totalRow = rows.length + 2;
+  sheet.getRange(totalRow, 1, 1, 4)
+    .setValues([['TOTAL: ' + TODOS_MUNICIPIOS.length + ' municípios', 'Pendentes: ' + pendentes.length, 'Inscritos: ' + inscritos.length, '']])
+    .setFontWeight('bold')
+    .setBackground('#e8edf5');
+
+  sheet.setColumnWidth(1, 240);
+  sheet.setColumnWidth(2, 90);
+  sheet.setColumnWidth(3, 210);
+  sheet.setColumnWidth(4, 260);
+  sheet.setFrozenRows(1);
 }
 
 function jsonResponse(obj) {

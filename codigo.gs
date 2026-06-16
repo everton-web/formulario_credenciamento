@@ -323,6 +323,18 @@ function atualizarPainelVagas() {
 
 function onOpen() {
   getFuncoesSheet();
+  SpreadsheetApp.getUi()
+    .createMenu('⚙️ Gestão')
+    .addItem('🔄 Atualizar Painel de Vagas', 'atualizarVagasManual')
+    .addSeparator()
+    .addItem('🔁 Resetar Aba Funções', 'resetarFuncoesSheet')
+    .addItem('🔧 Migrar Funções NTE', 'migrarFuncoesNTE')
+    .addToUi();
+}
+
+function atualizarVagasManual() {
+  atualizarPainelVagas();
+  SpreadsheetApp.getUi().alert('✅ Painel de vagas atualizado com sucesso!');
 }
 
 function onEdit(e) {

@@ -70,6 +70,7 @@ function carregarFuncoes() {
   var dados = sheet.getDataRange().getValues();
   var vagasLimites = {};
   var nteLimites = {};
+  var munCompartilhado = { nomes: [], limite: 417 };
 
   for (var i = 1; i < dados.length; i++) {
     var nome = String(dados[i][0] || '').trim();
@@ -77,13 +78,16 @@ function carregarFuncoes() {
     var tipo = String(dados[i][2] || '').trim();
     if (!nome) continue;
 
-    if (tipo === 'Institucional') {
+    if (nome === 'Secretário(a) Municipal' || nome === 'Técnico Municipal') {
+      munCompartilhado.nomes.push(nome);
+      if (munCompartilhado.nomes.length === 1) munCompartilhado.limite = limite;
+    } else if (tipo === 'Institucional') {
       vagasLimites[nome] = limite;
     } else if (tipo === 'NTE') {
       nteLimites[nome] = limite;
     }
   }
-  return { vagasLimites: vagasLimites, nteLimites: nteLimites };
+  return { vagasLimites: vagasLimites, nteLimites: nteLimites, munCompartilhado: munCompartilhado };
 }
 
 function doGet(e) {
@@ -163,8 +167,8 @@ function doPost(e) {
     } else {
       funcaoFinal = payload.funcao;
 
-      // Secretário(a) Municipal e Técnico Municipal: apenas 1 representante (de qualquer uma das 2 funções) por município
       if (funcaoFinal === 'Secretário(a) Municipal' || funcaoFinal === 'Técnico Municipal') {
+        // Apenas 1 representante (de qualquer uma das 2 funções) por município
         if (!payload.municipio) {
           return jsonResponse({ success: false, message: 'Selecione o município.' });
         }
@@ -178,19 +182,29 @@ function doPost(e) {
             });
           }
         }
-      }
-
-      var limiteInst = funcoes.vagasLimites[funcaoFinal];
-      if (limiteInst !== undefined && limiteInst > 0) {
-        var countInst = 0;
-        for (var k = 1; k < dados.length; k++) {
-          if (String(dados[k][6]).trim() === funcaoFinal) countInst++;
+        // Limite combinado compartilhado entre as duas funções municipais
+        var limComp = funcoes.munCompartilhado.limite;
+        var countComp = 0;
+        for (var c = 1; c < dados.length; c++) {
+          var fc = String(dados[c][6]).trim();
+          if (fc === 'Secretário(a) Municipal' || fc === 'Técnico Municipal') countComp++;
         }
-        if (countInst >= limiteInst) {
-          return jsonResponse({
-            success: false,
-            message: 'Vagas esgotadas para "' + funcaoFinal + '".'
-          });
+        if (countComp >= limComp) {
+          return jsonResponse({ success: false, message: 'Vagas esgotadas para representante municipal.' });
+        }
+      } else {
+        var limiteInst = funcoes.vagasLimites[funcaoFinal];
+        if (limiteInst !== undefined && limiteInst > 0) {
+          var countInst = 0;
+          for (var k = 1; k < dados.length; k++) {
+            if (String(dados[k][6]).trim() === funcaoFinal) countInst++;
+          }
+          if (countInst >= limiteInst) {
+            return jsonResponse({
+              success: false,
+              message: 'Vagas esgotadas para "' + funcaoFinal + '".'
+            });
+          }
         }
       }
     }
@@ -264,6 +278,14 @@ function atualizarPainelVagas() {
     var limiteInst = funcoesData.vagasLimites[nome];
     var inscInst = contagem[nome] || 0;
     rows.push([nome, limiteInst, inscInst, Math.max(0, limiteInst - inscInst)]);
+  }
+
+  // Representantes municipais: Secretário(a) Municipal + Técnico Municipal (pool compartilhado)
+  var munComp = funcoesData.munCompartilhado;
+  if (munComp.nomes.length > 0) {
+    var inscComp = 0;
+    for (var p = 0; p < munComp.nomes.length; p++) inscComp += (contagem[munComp.nomes[p]] || 0);
+    rows.push(['Secretário(a) / Técnico Municipal', munComp.limite, inscComp, Math.max(0, munComp.limite - inscComp)]);
   }
 
   // Entradas NTE (lidas da aba Funcoes)

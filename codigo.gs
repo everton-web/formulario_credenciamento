@@ -763,9 +763,12 @@ function onOpen() {
     .addToUi();
 }
 
-// Lê a aba Municípios desta planilha, filtra os pendentes e grava na planilha externa
-// (SHEET_DESTINO_ID), sobrescrevendo o snapshot anterior e registrando data/hora da extração.
+// Atualiza os painéis (Vagas + Municípios) desta planilha, lê a aba Municípios já atualizada,
+// filtra os pendentes e grava na planilha externa (SHEET_DESTINO_ID), sobrescrevendo o
+// snapshot anterior e registrando data/hora da extração.
 function extrairPendentesParaOutraPlanilha() {
+  atualizarTudo();
+
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_MUNICIPIOS);
   if (!sheet) return;
 

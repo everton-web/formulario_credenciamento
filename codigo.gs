@@ -759,7 +759,7 @@ function onOpen() {
     .addItem('🔧 Migrar Funções NTE', 'migrarFuncoesNTE')
     .addSeparator()
     .addItem('📤 Extrair Pendentes Agora', 'extrairPendentesParaOutraPlanilhaManual')
-    .addItem('⏱️ Configurar Trigger de Extração (10min)', 'configurarTriggerExtracaoPendentes')
+    .addItem('⏱️ Configurar Trigger de Extração (5min)', 'configurarTriggerExtracaoPendentes')
     .addToUi();
 }
 
@@ -813,7 +813,7 @@ function extrairPendentesParaOutraPlanilhaManual() {
   SpreadsheetApp.getUi().alert('✅ Pendentes extraídos para a planilha externa!');
 }
 
-// Roda uma vez (ou sempre que quiser recriar) para agendar a extração automática a cada 10 minutos
+// Roda uma vez (ou sempre que quiser recriar) para agendar a extração automática a cada 5 minutos
 function configurarTriggerExtracaoPendentes() {
   var triggers = ScriptApp.getProjectTriggers();
   for (var i = 0; i < triggers.length; i++) {
@@ -823,9 +823,9 @@ function configurarTriggerExtracaoPendentes() {
   }
   ScriptApp.newTrigger('extrairPendentesParaOutraPlanilha')
     .timeBased()
-    .everyMinutes(10)
+    .everyMinutes(5)
     .create();
-  SpreadsheetApp.getUi().alert('✅ Trigger configurado: extração automática a cada 10 minutos.');
+  SpreadsheetApp.getUi().alert('✅ Trigger configurado: extração automática a cada 5 minutos.');
 }
 
 function atualizarTudo() {
